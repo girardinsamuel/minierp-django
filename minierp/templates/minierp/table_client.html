@@ -1,0 +1,34 @@
+{% if client_list %}
+<table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th>N°</th>
+      <th>Nom</th>
+      <th>Prénom</th>
+      <th>Adresse</th>
+      <th>Code Postal</th>
+      <th>Ville</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for c in client_list %}
+      <tr>
+      <td>{{ c.pk }}</td>
+      <td>{{ c.nom }}</td>
+      <td>{{ c.prenom }}</td>
+      <td>{{ c.adresse }}</td>
+      <td>{{ c.cp }}</td>
+      <td>{{ c.ville }}</td>
+      <td><a href="{% url 'client-edit' c.pk  %}" class="btn btn-sm btn-primary" role="button">Modifier</a></td>
+      <td><a href="{% url 'client-detail' c.pk  %}" class="btn btn-sm btn-primary" role="button">Fiche</a></td>
+      <td><a href="#" class="btn btn-sm btn-primary" role="button">Facturer</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>Pas de clients.</p>
+{% endif %}

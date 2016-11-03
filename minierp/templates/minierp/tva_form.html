@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block title %}TVA{% endblock title %}
+
+{% block content %}
+  <!-- Page Content -->
+  <div class="container">
+      <div class="page-header">
+          <div class="row">
+              <div class="col-lg-5">
+                  <h3>Ajout d'une TVA</h3>
+                  {% include "messages.html" %}
+                  {% crispy form %}
+              </div>
+              <div class="col-lg-7">
+                  <h3>Liste des TVA</h3>
+                  {% if tva_list %}
+                    <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                      <thead>
+                        <tr>
+                          <th>Tva</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for tva in tva_list %}
+                          <tr>
+                          <td>{{ tva.value }}</td>
+                          <td><a href="{% url 'delete-tva' tva.pk %}" class="btn btn-sm btn-danger" role="button">Supprimer</a></td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                    {% else %}
+                    <p>Pas de tva ajoutée.</p>
+                    {% endif %}
+              </div>
+          </div>
+      </div>
+  </div>
+{% endblock content %}

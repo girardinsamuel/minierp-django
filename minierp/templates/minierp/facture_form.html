@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% block title %}{% if is_edition %}Modifier{% else %}Crééer{% endif %} une facture{% endblock title %}
+
+{% block content %}        
+  <!-- Page Content -->
+  <div class="container">
+      <div class="page-header">
+          <div class="row">
+
+              <div class="col-lg-10">
+                <h3>{% if is_edition %}Modifier{% else %}Crééer{% endif %} une facture</h3>
+                {% crispy form %}
+                  <form method="post" action="">
+                      <!--{{ description_form }}-->
+                      <!--</form>-->
+                  <!--Bug because the formset is not included in the form ? two forms ?-->
+                {{ description_form.management_form }}
+                {% for description_step in description_form %}
+                  <div class="link-formset">
+                    {{ description_step }}
+                  </div>
+                {% endfor %}
+
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+{% endblock content %}
+new
+{% block extra_script_content  %}
+{{ form.media }}
+
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+
+<script>
+    $('.link-formset').formset({
+        addText: 'add link',
+        deleteText: 'remove'
+    });
+</script>
+
+<script>
+$(document).ready(function(){
+  $(function() {
+    $( "#id_date" ).datepicker();
+  });
+});
+
+$(document).ready(function() {
+  $("#id_id_client").change(function(){
+    $.ajax({
+      // The URL for the request
+      url: "/minierp/client-data/",
+      // The data to send (will be converted to a query string)
+      data: {
+          id: $(this).val()
+      },
+      // Whether this is a POST or GET request
+      type: "POST",
+      // The type of data we expect back
+      dataType : "json",
+      // Code to run if the request succeeds;
+      // the response is passed to the function
+      success: function( json ) {
+          $("#id_client_address").val(json.address);
+          $("#id_client_cp").val(json.cp);
+          $("#id_client_city").val(json.city);
+      }
+    });
+  });
+});
+</script>
+
+{% endblock %}

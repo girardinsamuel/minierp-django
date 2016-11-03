@@ -37,7 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'minierp',
+    'minierp.apps.MinierpConfig',
+    'crispy_forms',
+    'dal',
+    'dal_select2',
+    # debug only
+    'debug_toolbar',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -45,6 +50,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware', #debug
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -119,3 +125,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
+
+# Debug
+INTERNAL_IPS = ['127.0.0.1']
+
+# Forms
+CRISPY_TEMPLATE_PACK = 'bootstrap3'

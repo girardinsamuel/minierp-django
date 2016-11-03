@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if is_edition %}Modifier{% else %}Ajouter{% endif %} un client{% endblock title %}
+
+{% block content %}        
+  <!-- Page Content -->
+  <div class="container">
+      <div class="page-header">
+          <div class="row">
+              <div class="col-lg-10">
+                  <h3>{% if is_edition %}Modification{% else %}Ajout{% endif %} d'un client</h3>
+                    {% crispy form %}
+              </div>
+          </div>
+      </div>
+  </div>
+{% endblock content %}

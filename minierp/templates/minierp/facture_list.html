@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Liste factures{% endblock title %}
+
+
+{% block extra_head_content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css">
+{% endblock %}
+
+{% block content %}
+<!-- Page Content -->
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <h3>Liste des factures ({{ facture_list.count }})</h3>
+      <div class="col-lg-12">
+      {% include "messages.html" %}
+      {% include "minierp/table_facture.html" %}
+      {% if is_paginated %}
+        <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Précédente</a> —
+        {% endif %}
+        Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+        {% if page_obj.has_next %}
+        — <a href="?page={{ page_obj.next_page_number }}">Suivante</a>
+        {% endif %}
+        </div>
+      {% endif %}
+        </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block extra_script_content  %}
+<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  $('#example').DataTable();
+} );
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title %}Fiche client{% endblock title %}
+
+{% block content %}        
+  <!-- Page Content -->
+  <div class="container">
+    <h3 class="text-center">Fiche client n° {{ client.pk }}</h3>
+    <div class="row">
+      <div class="col-sm-4">
+        <img src="{% static 'img/client_avatar.png' %}" class="img-thumbnail" >
+      </div>
+      <div class="col-sm-8">
+        <div class="row">
+          <div class="well well-lg">
+            <p> {{ client.civilite }} {{ client.nom }} {{ client.prenom }}</p>
+            <p> {{ client.adresse }}</p>
+            <p> {{ client.cp }} {{ client.ville }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <a href="{% url 'client-delete' client.pk %}" class="btn btn-danger pull-left">Supprimer</a>
+          <a href="{% url 'client-edit' client.pk %}" class="btn btn-primary pull-right" >Modifier</a>
+          <a href="#" class="btn btn-primary pull-right">Facturer</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

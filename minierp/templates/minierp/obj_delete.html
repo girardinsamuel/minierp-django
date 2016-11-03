@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Suppression client{% endblock title %}
+
+{% block content %}        
+  <!-- Page Content -->
+  <div class="container">
+      <div class="page-header">
+          <div class="row">
+              <div class="col-lg-12">
+                  <h3>Êtes-vous sûr de vouloir supprimer ce client ?</h3>
+                  <p>{{ obj }} </p>
+                  <form method="post" action="">
+                    {% csrf_token %}
+                  <input type="submit" class="btn btn-danger" value="Supprimer" /> <a type="button" href="{% url 'client-list' %}" class="btn btn-default">Annuler</a>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+{% endblock content %}
