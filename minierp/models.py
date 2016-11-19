@@ -24,7 +24,7 @@ class Tva(models.Model):
     value = models.DecimalField(max_digits=4, decimal_places=2)
 
     def __unicode__(self):
-      return str(self.value)
+      return unicode(self.value)
 
 
 class Facture(models.Model):
@@ -41,7 +41,7 @@ class Facture(models.Model):
     netapayer = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __unicode__(self):
-        return str(self.id_client)
+        return unicode(self.id_client)
 
     def get_client(self):
         return unicode(self.id_client)
