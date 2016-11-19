@@ -41,6 +41,9 @@ H = 297 * mm
 W = 210 * mm
 mX1 = 60
 d = 20
+MAX_NEW_PAGE = 700
+MAX_ONE_PAGE = 410
+LINE_HEIGHT = 18
 backColor = '#FFFF00' # debug
 dateline = 'Nolay, le %s'
 l_prixht = 'Total HT'
@@ -89,9 +92,10 @@ def add_description_step(pdf, formset):
     p_title.drawOn(pdf, mX1, -300)
 
     # 2 add description
-    p = ParagraphStyle(name='Description', fontName='ErasITC-Light', fontSize=12,  leading = 20)
-    p_description = Paragraph(unicode(description_step).replace('\r','<br />\n'), p)
-    w,h = p_description.wrap(210*mm, 400)
+    p = ParagraphStyle(name='Description', fontName='ErasITC-Light', fontSize=12,  leading=18, backColor='red')
+    p_description = Paragraph(description_step, p)
+    w, h = p_description.wrap(153*mm, 300)
+    print h
     p_description.drawOn(pdf, mX1 +20, -310-h)
 
 
@@ -140,6 +144,16 @@ def add_additional_text(pdf, text):
     p_description.wrap(210 * mm, 400)
     p_description.drawOn(pdf, mX1 + 20, -750)
 
+def get_height_step(formset):
+    description_step = formset.step_description
+    # number of lines of description + 1 one for title
+    nb = description_step.count('\n') + 2
+    h = nb * d + 10 # interligne
+    # TODO change with wrap paragraph to get height ?
+    return h
+
+def change_page(pdf):
+    pass
 
 def generate_quote(response, q):
 
@@ -163,6 +177,8 @@ def generate_invoice(response, f, formset):
     \r
     JP Girardin."""
 
+    # formset.step_description = unicode(formset.step_description).replace('\r','\n') # <br />
+
     # init pdf canvas
     pdf = init_pdf(response)
     add_header(pdf)
@@ -171,30 +187,28 @@ def generate_invoice(response, f, formset):
     # add client block
     add_client_and_title(pdf, nf_line, c, date)
 
-    # check total height of steps
-    # check if add txt
-    # if inferior to max height -> ok
-    # else put add_txt on other page
-    # if inferior to max height -> ok
-    # else check how many can fit
-    # then put remanings on next page
-    # add add txt
-    # add prices
-
-    # loop on steps
-    # while fit ok ((with max p1)
-    # add txt ?
-    # other page or not
-    # prices
-    # if not fit next page
-    # while fit (with max p2)
-    # add txt ?
-    # other page or note
-    # add prices
-
+    hmax = MAX_ONE_PAGE
+    first = True
+    a = f.add_description
+    formset.step_description = unicode(a).replace(r'\r', '</br>\n')
+    # for step in steps:
+    step = formset
+    h = get_height_step(step)
+    print  h
+    if not h < hmax and h < MAX_NEW_PAGE and first:
+        first = False
+        hmax = MAX_NEW_PAGE
+        add_description_step(pdf, formset)
+        # continue
+    if not h < hmax:
+        change_page(pdf)
     add_description_step(pdf, formset)
 
-    add_additional_text(pdf, add_txt)
+    # if f.add_description:
+    #     h = get_height(f.add_description)
+    #     if not h < hmax:
+    #         change_page(pdf)
+    #     add_additional_text(pdf, f.add_description)
 
     add_prices(pdf, prices)
 

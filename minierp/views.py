@@ -4,14 +4,16 @@ import json
 
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
+from django.forms import formset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView, View
 
-from minierp.models import Client, Tva, Facture
-from minierp.forms import ClientForm, TvaForm, FactureForm, DescriptionFormSet
+from minierp.models import Client, Tva, Facture, FactureStep
+from minierp.forms import ClientForm, TvaForm, FactureForm, DescriptionFormSet, FactureStepForm
 from minierp.pdf import generate_invoice
 
 from dal import autocomplete
@@ -127,58 +129,161 @@ def get_client_data(request):
     return HttpResponse(json.dumps(response))
 
 
-class FactureCreate(SuccessMessageMixin, CreateView):
-    model = Facture
-    form_class = FactureForm
-    success_url = reverse_lazy('facture-list')
-    success_message = u'La facture a bien été créée.'
+# class FactureCreate(CreateView):
+#     model = Facture
+#     form_class = FactureForm
+#     success_url = reverse_lazy('facture-list')
+#     success_message = u'La facture a bien été créée.'
+#
+#     def get_context_data(self, **kwargs):
+#         data = super(FactureCreate, self).get_context_data(**kwargs)
+#         if self.request.POST:
+#             data['descriptions'] = DescriptionFormSet(self.request.POST)
+#         else:
+#             data['descriptions'] = DescriptionFormSet()
+#         return data
+#
+#     def form_valid(self, form):
+#
+# def facture_create(request):
+#
+#         # Get our existing formset data for this facture.  This is used as initial data.
+#         # facture_steps = FactureStep.objects.filter(facture=facture.pk)
+#         # facture_data = [{'step_title': fs.step_title, 'step_description': l.step_description} for fs in facture_steps]
+#         #
+#         if request.method == 'POST':
+#             facture_form = FactureForm(request.POST)
+#             des_formset = DescriptionFormSet(request.POST)
+#
+#             if facture_form.is_valid() and des_formset.is_valid():
+#                 # Save facture info
+#                 obj = facture_form.save()
+#                 # description_form.instance = self.object
+#
+#
+#             new_des = []
+#             # id = facture_form.cleaned_data.get('pk')
+#             # id = facture_form.pk
+#             for des_form in des_formset:
+#                 d = des_form.cleaned_data.get('step_description')
+#                 t = des_form.cleaned_data.get('step_title')
+#                 # id = des_form.cleaned_data.get('id')
+#                 des_form.instance = obj
+#                 new_des.append(FactureStep(facture=obj, step_description=d, step_title=t))
+#
+#             with transaction.atomic():
+#                 FactureStep.objects.filter(facture=obj.pk).delete()
+#                 x = new_des[0].facture_id
+#
+#                 FactureStep.objects.bulk_create(new_des)
+#
+#             messages.success(request, 'You have updated your profile.')
+#             return HttpResponseRedirect(reverse_lazy('facture-list'))
+#         else:
+#             facture_form = FactureForm()
+#             des_formset = DescriptionFormSet()
+#
+#         context = {
+#             'form': facture_form,
+#             'descriptions': des_formset,
+#         }
+#
+#         return render(request, 'minierp/facture_form.html', context)
 
-    def get(self, request, *args, **kwargs):
-        """
-        Handles GET requests and instantiates blank versions of the form
-        and its inline formsets.
-        """
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        description_form = DescriptionFormSet()
-        return self.render_to_response(
-            self.get_context_data(form=form,
-                                  description_form=description_form))
+def facture_create(request):
 
-    def post(self, request, *args, **kwargs):
-        """
-        Handles POST requests, instantiating a form instance and its inline
-        formsets with the passed POST variables and then checking them for
-        validity.
-        """
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        description_form = DescriptionFormSet(self.request.POST)
-        if form.is_valid():
-            if description_form.is_valid():
-                return self.form_valid(form, description_form)
-        else:
-            return self.form_invalid(form, description_form)
+    FactureStepFormSet = formset_factory(FactureStepForm, formset=DescriptionFormSet )
 
-    def form_valid(self, form, description_form):
-        """
-        Called if all forms are valid. Creates a Recipe instance along with
-        associated Ingredients and Instructions and then redirects to a
-        success page.
-        """
-        self.object = form.save()
-        description_form.instance = self.object
-        description_form.save()
-        return HttpResponseRedirect(self.get_success_url())
+    # get existing in case of edition (nothing here in creation)
 
-    def form_invalid(self, form, description_form):
-        """
-        Called if a form is invalid. Re-renders the context data with the
-        data-filled forms and errors.
-        """
-        return self.render_to_response(self.get_context_data(form=form, description_form=description_form))
+    if request.method == 'POST':
+        facture_form = FactureForm(request.POST)
+        facturestep_formset = FactureStepFormSet(request.POST)
+
+        if facture_form.is_valid() and facturestep_formset.is_valid():
+
+            # Save facture info
+            f = facture_form.save()
+            # description_form.instance = self.object
+
+            new_steps = []
+            for facturestep in facturestep_formset:
+                d = facturestep.cleaned_data.get('step_description')
+                t = facturestep.cleaned_data.get('step_title')
+
+                if d and t:
+                    new_steps.append(FactureStep(facture=f, step_description=d, step_title=t))
+
+            with transaction.atomic():
+                # Replace the old with the new
+                FactureStep.objects.filter(facture=f).delete()
+                FactureStep.objects.bulk_create(new_steps)
+
+        messages.success(request, 'Facture created.')
+        return HttpResponseRedirect(reverse_lazy('facture-list'))
+    else:
+        facture_form = FactureForm()
+        facturestep_formset = DescriptionFormSet()# put initial data in edition
+
+    context = {
+        'form': facture_form,
+        'facturestep_formset': facturestep_formset,
+    }
+
+    return render(request, 'minierp/facture_form.html', context)
+
+# class FactureCreate(SuccessMessageMixin, CreateView):
+#     model = Facture
+#     form_class = FactureForm
+#     success_url = reverse_lazy('facture-list')
+#     success_message = u'La facture a bien été créée.'
+#
+#     def get(self, request, *args, **kwargs):
+#         """
+#         Handles GET requests and instantiates blank versions of the form
+#         and its inline formsets.
+#         """
+#         self.object = None
+#         form_class = self.get_form_class()
+#         form = self.get_form(form_class)
+#         description_form = DescriptionFormSet()
+#         return self.render_to_response(
+#             self.get_context_data(form=form,
+#                                   description_form=description_form))
+#
+#     def post(self, request, *args, **kwargs):
+#         """
+#         Handles POST requests, instantiating a form instance and its inline
+#         formsets with the passed POST variables and then checking them for
+#         validity.
+#         """
+#         self.object = None
+#         form_class = self.get_form_class()
+#         form = self.get_form(form_class)
+#         description_form = DescriptionFormSet(self.request.POST)
+#         if form.is_valid():
+#             if description_form.is_valid():
+#                 return self.form_valid(form, description_form)
+#         else:
+#             return self.form_invalid(form, description_form)
+#
+#     def form_valid(self, form, description_form):
+#         """
+#         Called if all forms are valid. Creates a Recipe instance along with
+#         associated Ingredients and Instructions and then redirects to a
+#         success page.
+#         """
+#         self.object = form.save()
+#         description_form.instance = self.object
+#         description_form.save()
+#         return HttpResponseRedirect(self.get_success_url())
+#
+#     def form_invalid(self, form, description_form):
+#         """
+#         Called if a form is invalid. Re-renders the context data with the
+#         data-filled forms and errors.
+#         """
+#         return self.render_to_response(self.get_context_data(form=form, description_form=description_form))
 
 
 class FactureEdit(SuccessMessageMixin, UpdateView):
@@ -186,6 +291,11 @@ class FactureEdit(SuccessMessageMixin, UpdateView):
     form_class = FactureForm
     success_url = reverse_lazy('facture-list')
     success_message = u'La facture a bien été modifiée.'
+
+
+class formset_debug(object):
+    step_title = 'Restauration d\'une commode'
+    step_description = 'test'*60
 
 
 def FactureDetail(request, pk):
@@ -203,6 +313,7 @@ def FactureDetail(request, pk):
     response['Content-Disposition'] = 'inline; filename=' + filename + '.pdf'
 
     # generate pdf with report lab library
+    formset = formset_debug()
     pdf = generate_invoice(response, facture, formset)
 
     # show page

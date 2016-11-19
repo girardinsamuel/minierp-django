@@ -55,7 +55,16 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'minierp.middlewares.RequireLoginMiddleware', # for accepting only logged user
 ]
+
+LOGIN_REQUIRED_URLS = (
+    r'/minierp/(.*)$',
+)
+LOGIN_REQUIRED_URLS_EXCEPTIONS = (
+    r'/minierp/login(.*)$',
+    r'/minierp/logout(.*)$',
+)
 
 ROOT_URLCONF = 'gestion.urls'
 

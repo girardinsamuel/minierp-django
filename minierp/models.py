@@ -41,7 +41,7 @@ class Facture(models.Model):
     netapayer = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __unicode__(self):
-        return str(self.titre)
+        return str(self.id_client)
 
     def get_client(self):
         return unicode(self.id_client)
@@ -51,3 +51,6 @@ class FactureStep(models.Model):
     facture = models.ForeignKey(Facture)
     step_title = models.CharField(max_length=255)
     step_description = models.TextField(max_length=500)
+
+    def __unicode__(self):
+        return str(self.step_title)

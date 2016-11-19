@@ -39,7 +39,28 @@ class ClientForm(ModelForm):
             ))
 
 
-DescriptionFormSet = inlineformset_factory(Facture, FactureStep, extra=1, fields='__all__')
+DescriptionFormSet = inlineformset_factory(Facture, FactureStep, extra=1, max_num=6, can_delete=True, fields='__all__')
+
+
+class FactureStepForm(ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(FactureStepForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(form=self)
+        self.helper.form_method = 'POST'
+        self.form_tag = False
+        self.helper.form_class = 'form-horizontal'
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-8'
+        self.helper.layout = Layout(
+            Fieldset(
+                'Step',
+                Field('step_title'),
+                Field('step_description')))
+
+    class Meta:
+        model = FactureStep
+        fields = ('step_title', 'step_description')
 
 
 class FactureForm(ModelForm):
