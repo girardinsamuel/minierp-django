@@ -19,6 +19,11 @@ from minierp.pdf import generate_invoice
 from dal import autocomplete
 
 
+def test(request):
+
+    return render(request, 'minierp/test.html')
+
+
 def home(request):
     context_dict = {}
     # recuperer les derniers clients, devis, factures
@@ -26,12 +31,11 @@ def home(request):
     # context_dict['devis_list'] = Devis.objects.order_by('-pk')[:3]
     context_dict['facture_list'] = Facture.objects.order_by('-pk')[:3]
 
-    return render(request,'base.html', context_dict)
+    return render(request, 'base.html', context_dict)
 
 
 class ClientList(ListView):
     model = Client
-    paginate_by = 10
 
 
 class ClientCreate(SuccessMessageMixin, CreateView):
@@ -102,7 +106,7 @@ class DeleteTva(SuccessMessageMixin, DeleteView):
 
 class FactureList(ListView):
     model = Facture
-    paginate_by = 10
+    # paginate_by = 10
 
 
 class ClientAutocomplete(autocomplete.Select2QuerySetView):
@@ -219,8 +223,8 @@ def facture_create(request):
                 FactureStep.objects.filter(facture=f).delete()
                 FactureStep.objects.bulk_create(new_steps)
 
-        messages.success(request, 'Facture created.')
-        return HttpResponseRedirect(reverse_lazy('facture-list'))
+            messages.success(request, 'La facture n° %d a bien été créée.' % f.pk)
+            return HttpResponseRedirect(reverse_lazy('facture-list'))
     else:
         facture_form = FactureForm()
         facturestep_formset = DescriptionFormSet()# put initial data in edition
@@ -228,16 +232,63 @@ def facture_create(request):
     context = {
         'form': facture_form,
         'facturestep_formset': facturestep_formset,
+        'is_edition': False
     }
 
     return render(request, 'minierp/facture_form.html', context)
 
 
-class FactureEdit(SuccessMessageMixin, UpdateView):
-    model = Facture
-    form_class = FactureForm
-    success_url = reverse_lazy('facture-list')
-    success_message = u'La facture a bien été modifiée.'
+
+def facture_edit(request):
+
+    FactureStepFormSet = formset_factory(FactureStepForm, formset=DescriptionFormSet )
+
+    # get existing in case of edition (nothing here in creation)
+
+    if request.method == 'POST':
+        facture_form = FactureForm(request.POST)
+        facturestep_formset = FactureStepFormSet(request.POST)
+
+        if facture_form.is_valid() and facturestep_formset.is_valid():
+
+            # Save facture info
+            f = facture_form.save()
+            # description_form.instance = self.object
+
+            new_steps = []
+            for facturestep in facturestep_formset:
+                d = facturestep.cleaned_data.get('step_description')
+                t = facturestep.cleaned_data.get('step_title')
+
+                if d and t:
+                    new_steps.append(FactureStep(facture=f, step_description=d, step_title=t))
+
+            with transaction.atomic():
+                # Replace the old with the new
+                FactureStep.objects.filter(facture=f).delete()
+                FactureStep.objects.bulk_create(new_steps)
+
+            messages.success(request, 'La facture n° %d a bien été modifiée.' % f.pk)
+            return HttpResponseRedirect(reverse_lazy('facture-list'))
+    else:
+        facture_form = FactureForm()
+        facturestep_formset = DescriptionFormSet()# put initial data in edition
+
+    context = {
+        'form': facture_form,
+        'facturestep_formset': facturestep_formset,
+        'is_edition': True
+    }
+
+    return render(request, 'minierp/facture_form.html', context)
+
+
+
+# class FactureEdit(SuccessMessageMixin, UpdateView):
+#     model = Facture
+#     form_class = FactureForm
+#     success_url = reverse_lazy('facture-list')
+#     success_message = u'La facture a bien été modifiée.'
 
 
 class formset_debug(object):

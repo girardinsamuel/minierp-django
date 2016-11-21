@@ -1,57 +1,164 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% load bootstrap %}
 {% load staticfiles %}
 
 {% block title %}{% if is_edition %}Modifier{% else %}Crééer{% endif %} une facture{% endblock title %}
 
-{% block content %}        
-  <!-- Page Content -->
-  <div class="container">
-      <div class="page-header">
-          <div class="row">
+{% block extra_head_content %}
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+{% endblock extra_head_content %}
 
-              <div class="col-lg-10">
+{% block content %}
+<!-- Page Content -->
+<div class="container">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-lg-10">
                 <h3>{% if is_edition %}Modifier{% else %}Crééer{% endif %} une facture</h3>
-                       <form method="post">
+
+                <form class="form-horizontal" method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
+
+                    <legend class="col-form-legend">Client</legend>
+                    <div class="form-group row">
+                        <div class="col-xs-8">
+                            {{ form.id_client }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" id="id_client_address" placeholder="Adresse">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="id_client_cp" placeholder="Code Postal">
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="id_client_city" placeholder="Ville">
+                            </div>
+                        </div>
+                    </div>
+
+                    <legend class="col-form-legend">Détails</legend>
+
+                     <!--<input type="text" class="form-control" id="id_date" placeholder="DAte 2">-->
+
+                     <div class="form-group row">
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                 {{ form.date }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ form.add_description|bootstrap_horizontal }}
 
 
+                    {% for facturestep in facturestep_formset %}
+                    <div class="link-formset">
+                        {% if facturestep.instance.pk %}{{ facturestep.DELETE }}{% endif %}
 
-    {% for facturestep in facturestep_formset %}
-            <div class="link-formset">
-                {% if facturestep.instance.pk %}{{ facturestep.DELETE }}{% endif %}
+                        {{ facturestep|bootstrap_horizontal}}
+                        {% comment %}
+                        {% if facturestep.step_title.errors %}
+                        {% for error in facturestep.step_title.errors %}
+                        {{ error|escape }}
+                        {% endfor %}
+                        {% endif %}
 
-            {{ facturestep.step_title }}
-            {% if facturestep.step_title.errors %}
-                {% for error in facturestep.step_title.errors %}
+                        {{ facturestep.step_description }}
+                        {% if facturestep.step_description.errors %}
+                        {% for error in facturestep.step_description.errors %}
+                        {{ error|escape }}
+                        {% endfor %}
+                        {% endif %}
+                        {% endcomment %}
+                    </div>
+
+                    {% endfor %}
+                    {{ facturestep_formset.management_form }}
+
+                    {% if facturestep.non_form_errors %}
+                    {% for error in facturestep.non_form_errors %}
                     {{ error|escape }}
-                {% endfor %}
-            {% endif %}
+                    {% endfor %}
+                    {% endif %}
 
-            {{ facturestep.step_description }}
-            {% if facturestep.step_description.errors %}
-                {% for error in facturestep.step_description.errors %}
-                    {{ error|escape }}
-                {% endfor %}
-            {% endif %}
-            </div>
+                    <legend class="col-form-legend">Tarification</legend>
+                    <div class="form-group row">
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.acompteht }}
+                                <div class="input-group-addon">€</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.prixht }}
+                                <div class="input-group-addon">€</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.acomptettc }}
+                                <div class="input-group-addon">€</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.prixttc }}
+                                <div class="input-group-addon">€</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.dejaregle }}
+                                <div class="input-group-addon">€</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.parttva }}
+                                <div class="input-group-addon">€</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.tva }}
+                                <div class="input-group-addon">%</div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                {{ form.netapayer }}
+                                <div class="input-group-addon">€</div>
+                            </div>
+                        </div>
+                    </div>
 
-    {% endfor %}
-   {{ facturestep_formset.management_form }}
-
-    {% if facturestep.non_form_errors %}
-        {% for error in facturestep.non_form_errors %}
-            {{ error|escape }}
-        {% endfor %}
-    {% endif %}
-
-                      <input type="submit" value="submit">
+                    <div class="form-group">
+                        <div class="controls ">
+                        <!--<div class="col-sm-10 col-sm-offset-2">-->
+                            <a class="btn btn-default" href="{% url 'facture-list' %}">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Crééer</button>
+                        </div>
+                    </div>
                 </form>
-              </div>
-          </div>
-      </div>
-  </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}
 
@@ -60,23 +167,32 @@
 
 
 <script src="{% static 'js/jquery.formset.js' %}"></script>
+<script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'js/locales/bootstrap-datepicker.fr.js' %}"></script>
 
 <script>
     $('.link-formset').formset({
         prefix:  '{{ facturestep_formset.prefix }}',
-        addText: 'add link',
-        deleteText: 'remove'
+        addText: 'Ajouter une étape',
+        deleteText: 'Enlever',
+        addCssClass: 'btn btn-primary',
+        deleteCssClass: 'btn btn-danger',
     });
 </script>
 
-
-
 <script>
+
 $(document).ready(function(){
   $(function() {
-    $( "#id_date" ).datepicker();
+   $('#id_date').datepicker({
+        format: "dd/mm/yyyy",
+        language: "fr",
+        autoclose: true,
+        todayHighlight: true
+        });
   });
 });
+
 
 $(document).ready(function() {
   $("#id_id_client").change(function(){
@@ -101,6 +217,8 @@ $(document).ready(function() {
     });
   });
 });
+
+
 </script>
 
 {% endblock %}

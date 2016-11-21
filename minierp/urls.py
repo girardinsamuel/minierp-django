@@ -5,6 +5,7 @@ from minierp.views import *
 
 urlpatterns = [
     url(r'^$', home, name='home'),
+    url(r'^test/$', test, name='test'),
     url(r'^tva/$', AddTva.as_view(), name='add-tva'),
     url(r'^tva/delete/(?P<pk>\d+)$', DeleteTva.as_view(), name='delete-tva'),
     url(r'^clients/$', ClientList.as_view(), name='client-list'),
@@ -16,8 +17,7 @@ urlpatterns = [
     url(r'^client-data/$', get_client_data, name='get_client_data'),
     url(r'^factures/$', FactureList.as_view(), name='facture-list'),
     url(r'^factures/create/$', facture_create, name='facture-create'),
-    # url(r'^factures/create/$', FactureCreate.as_view(), name='facture-create'),
-    url(r'^factures/edit/(?P<pk>\d+)$', FactureEdit.as_view(), name='facture-edit'),
+    url(r'^factures/edit/(?P<pk>\d+)$', facture_edit, name='facture-edit'),
     url(r'^factures/detail/(?P<pk>\d+)$', FactureDetail, name='facture-detail'),
     url(r'^factures/delete/(?P<pk>\d+)$', FactureDelete.as_view(), name='facture-delete'),
 ]

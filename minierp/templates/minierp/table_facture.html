@@ -4,9 +4,10 @@
     <tr>
       <th>N°</th>
       <th>Client</th>
-      <th>Titre</th>
-      <th>Description</th>
-      <th>Prix TTC</th>
+      <th>Date</th>
+      <th>TVA</th>
+      <th>Prix HT</th>
+      <th>Net à payer</th>
       <th></th>
       <th></th>
       <th></th>
@@ -14,12 +15,13 @@
   </thead>
   <tbody>
   {% for c in facture_list %}
-      <tr>
+  <tr>
       <td>{{ c.pk }}</td>
       <td>{{ c.get_client }}</td>
-      <td>{{ c.titre }}</td>
-      <td>{{ c.description }}</td>
-      <td>{{ c.prixttc }}</td>
+      <td>{{ c.date|date:"d/m/Y" }}</td>
+      <td>{{ c.tva }}</td>
+      <td>{{ c.prixht }}</td>
+      <td>{{ c.netapayer }}</td>
       <td><a href="{% url 'facture-edit' c.pk  %}" class="btn btn-sm btn-primary" role="button">Modifier</a></td>
       <td><a href="{% url 'facture-detail' c.pk  %}" class="btn btn-sm btn-primary" role="button">Imprimer</a></td>
       <td><a href="#" class="btn btn-sm btn-danger" role="button">Supprimer</a></td>

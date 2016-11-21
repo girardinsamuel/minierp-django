@@ -16,17 +16,6 @@
       <div class="col-lg-12">
       {% include "messages.html" %}
       {% include "minierp/table_facture.html" %}
-      {% if is_paginated %}
-        <div class="pagination">
-        {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">Précédente</a> —
-        {% endif %}
-        Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
-        {% if page_obj.has_next %}
-        — <a href="?page={{ page_obj.next_page_number }}">Suivante</a>
-        {% endif %}
-        </div>
-      {% endif %}
         </div>
     </div>
   </div>
@@ -40,7 +29,15 @@
 
 <script>
 $(document).ready(function() {
-  $('#example').DataTable();
+  $('#example').DataTable({
+  "language": {
+      "lengthMenu": "Afficher _MENU_ factures par page",
+      "zeroRecords": "Aucunes factures trouvées.",
+      "info": "Page affichée _PAGE_ sur _PAGES_",
+      "infoEmpty": "Pas de factures disponibles",
+      "infoFiltered": "(filtré sur _MAX_ factures)"
+      }
+  });
 } );
 </script>
 {% endblock %}
