@@ -51,7 +51,7 @@
                      <div class="form-group row">
                         <div class="col-xs-4">
                             <div class="input-group">
-                                 {{ form.date }}
+                                 {{ form.date|bootstrap_horizontal }}
                             </div>
                         </div>
                     </div>
@@ -193,7 +193,6 @@ $(document).ready(function(){
   });
 });
 
-
 $(document).ready(function() {
   $("#id_id_client").change(function(){
     $.ajax({
@@ -217,7 +216,6 @@ $(document).ready(function() {
     });
   });
 });
-
 
 </script>
 

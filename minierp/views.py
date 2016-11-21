@@ -7,7 +7,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.forms import formset_factory
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView, View
@@ -239,14 +239,18 @@ def facture_create(request):
 
 
 
-def facture_edit(request):
+def facture_edit(request, pk):
 
     FactureStepFormSet = formset_factory(FactureStepForm, formset=DescriptionFormSet )
 
     # get existing in case of edition (nothing here in creation)
+    facture = get_object_or_404(Facture, pk=pk)
+    facture_steps = FactureStep.objects.filter(facture=facture)
+    fs_data = [{'step_title': fs.step_title, 'step_description': fs.step_description}
+                 for fs in facture_steps]
 
     if request.method == 'POST':
-        facture_form = FactureForm(request.POST)
+        facture_form = FactureForm(request.POST, instance=facture)
         facturestep_formset = FactureStepFormSet(request.POST)
 
         if facture_form.is_valid() and facturestep_formset.is_valid():
@@ -271,8 +275,8 @@ def facture_edit(request):
             messages.success(request, 'La facture n° %d a bien été modifiée.' % f.pk)
             return HttpResponseRedirect(reverse_lazy('facture-list'))
     else:
-        facture_form = FactureForm()
-        facturestep_formset = DescriptionFormSet()# put initial data in edition
+        facture_form = FactureForm(instance=facture)
+        facturestep_formset = DescriptionFormSet(initial=fs_data)# put initial data in edition
 
     context = {
         'form': facture_form,
