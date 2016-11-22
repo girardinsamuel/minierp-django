@@ -81,26 +81,26 @@ def add_footer(pdf):
     pdf.drawImage(IMG_FOOTER, W/2-w/2, -H+20, width=w, height=h,  mask='auto')
 
 
-def add_description_step(pdf, formset):
-    title = formset.step_title
+def add_description_step(pdf, formset, h):
+    print 'h', h
+    title = '<u>' + formset.step_title + '</u>'
     description_step = formset.step_description
     # add description steps
     # 1 add title
-    p = ParagraphStyle(name='Description', fontName='ErasITC-Demi', fontSize=13,  leading = 20)
+    p = ParagraphStyle(name='Description', fontName='ErasITC-Light', fontSize=13,  leading=20)
     p_title = Paragraph(title, p)
     p_title.wrapOn(pdf, (210-2*mX1)*mm, 100)
-    p_title.drawOn(pdf, mX1, -300)
+    p_title.drawOn(pdf, mX1, -300-h)
 
     # 2 add description
-    p = ParagraphStyle(name='Description', fontName='ErasITC-Light', fontSize=12,  leading=18, backColor='red')
+    p = ParagraphStyle(name='Description', fontName='ErasITC-Light', fontSize=12,  leading=18) #, backColor='red')
     p_description = Paragraph(description_step, p)
-    w, h = p_description.wrap(153*mm, 300)
-    print h
-    p_description.drawOn(pdf, mX1 +20, -310-h)
+    w, h2 = p_description.wrap(153*mm, 300)
+    p_description.drawOn(pdf, mX1 +20, -310-h2-h)
 
 
 def add_prices(pdf, prices):
-    ph = 660
+    ph = 690
     pdf.drawString(mX1, -ph, l_prixht)
     pdf.drawString(mX1 + 95, -ph, l_tva)
     pdf.setFont('ErasITC-Demi', 13)
@@ -110,7 +110,7 @@ def add_prices(pdf, prices):
     pdf.setFont('ErasITC-Demi', 13)
     pdf.drawString(mX1 + 410, -ph, l_netapayer)
     pdf.setFont('ErasITC-Light', 13)
-    ph = 690
+    ph = 720
     pdf.drawString(mX1, -ph, '%.2f' % prices[0])
     pdf.drawString(mX1 + 95, -ph, '%.2f' % prices[1])
     pdf.setFont('ErasITC-Demi', 13)
@@ -144,16 +144,19 @@ def add_additional_text(pdf, text):
     p_description.wrap(210 * mm, 400)
     p_description.drawOn(pdf, mX1 + 20, -750)
 
+
 def get_height_step(formset):
     description_step = formset.step_description
     # number of lines of description + 1 one for title
     nb = description_step.count('\n') + 2
-    h = nb * d + 10 # interligne
+    h = nb * d + 30 # interligne
     # TODO change with wrap paragraph to get height ?
     return h
 
+
 def change_page(pdf):
     pass
+
 
 def generate_quote(response, q):
 
@@ -170,14 +173,6 @@ def generate_invoice(response, f, formset):
     prices = [f.prixht, f.parttva, f.prixttc, f.dejaregle, f.netapayer]
     nf = int(f.pk)
     nf_line = 'Facture n°%d' % nf
-    add_txt = """J'&eacute;mets une r&eacute;serve en ce qui concerne les parties totalement invisibles.\r
-    \r
-    Pose sur dalle, carrelage ou plancher.\r
-    Pr&eacute;voir la rehausse devant &#171; l'autel &#187;.\r
-    \r
-    JP Girardin."""
-
-    # formset.step_description = unicode(formset.step_description).replace('\r','\n') # <br />
 
     # init pdf canvas
     pdf = init_pdf(response)
@@ -189,20 +184,24 @@ def generate_invoice(response, f, formset):
 
     hmax = MAX_ONE_PAGE
     first = True
-    a = f.add_description
-    formset.step_description = unicode(a).replace(r'\r', '</br>\n')
-    # for step in steps:
-    step = formset
-    h = get_height_step(step)
-    print  h
-    if not h < hmax and h < MAX_NEW_PAGE and first:
-        first = False
-        hmax = MAX_NEW_PAGE
-        add_description_step(pdf, formset)
-        # continue
-    if not h < hmax:
-        change_page(pdf)
-    add_description_step(pdf, formset)
+    add_txt = unicode(f.add_description).replace(r'\r', '</br>\n')
+
+    for step in formset:
+        step.step_description = unicode(step.step_description).replace('\n','<br />\n')
+        h = get_height_step(step)
+        print 'loop h=', h
+        if h < hmax and h < MAX_NEW_PAGE and first:
+            print 'first'
+            first = False
+            hmax = MAX_NEW_PAGE
+            add_description_step(pdf, step, h=0)
+            # continue
+        else:
+            if not h < hmax:
+                print 'change'
+                change_page(pdf)
+            print 'second'
+            add_description_step(pdf, step, h)
 
     # if f.add_description:
     #     h = get_height(f.add_description)
@@ -213,88 +212,3 @@ def generate_invoice(response, f, formset):
     add_prices(pdf, prices)
 
     return pdf
-
-# def generate_facture(response, date, client, nf, title, description, prices):
-#     # Parse data
-#     dateline = 'Nolay, le %s' % date
-#     nfline = 'Facture n° %d' % nf
-#     l_prixht = 'Total HT'
-#     l_prixttc = 'Prix TTC'
-#     l_tva = 'Total TVA'
-#     l_acompte = 'Déjà réglé TTC'
-#     l_netapayer = 'Net à payer'
-#
-#     # Settings
-#     img_header = static +'/images/entete.png'
-#     img_footer = static +'/images/pied.png'
-#     pdf = canvas.Canvas(response)
-#     H = 297*mm
-#     W = 210*mm
-#     mX1 = 60
-#     d = 20
-#     pdf.setLineWidth(.3)
-#     pdf.setFont('ErasITC-Light', 13)
-#     pdf.translate(0,297*mm)
-#
-#     # Header
-#     w = 210/1.8*mm
-#     h = w * get_image(img_header)
-#     pdf.drawImage(img_header, W/2-w/2, -100, width=w, height=h,  mask='auto')
-#
-#     # Bloc adresse
-#     pdf.setFont('ErasITC-Demi', 13)
-#     pdf.drawString(mX1 +280,-180, client[0] + ' ' + client[1] + ' ' + client[2])
-#     pdf.setFont('ErasITC-Light', 13)
-#     pdf.drawString(mX1 +280,-180 - d, client[3])
-#     if client[4]:
-#         pdf.drawString(mX1 +280,-180 - 2*d, client[4] + ' ' + client[5])
-#     else:
-#         pdf.drawString(mX1 +280,-180 - 2*d, client[5])
-#     # Nf
-#     pdf.drawString(mX1,-200 -3*d, nfline)
-#     # Date
-#     pdf.drawString(mX1 + 280 ,-200 -3*d, dateline)
-#
-#     # Description
-#     p = ParagraphStyle(name='Description', fontName='ErasITC-Light', fontSize=13,  leading = 20)
-#     # backColor = '#FFFF00' debug
-#
-#     p_title = Paragraph('<u>'+title+'</u>', p)
-#     p_title.wrapOn(pdf, (210-2*mX1)*mm, 100)
-#     p_title.drawOn(pdf, mX1, -300)
-#
-#     p_description = Paragraph(unicode(description).replace('\r','<br />\n'), p)
-#     # p_description.wrapOn(pdf, (210-2*(mX1+10))*mm, 300)
-#     # p_description.wrapOn(pdf, (210-2*(mX1+10))*mm, 300)
-#     w,h = p_description.wrap((210-2*(mX1+10))*mm, 400)
-#     p_description.drawOn(pdf, mX1 +20, -310-h)
-#
-#     # Prix
-#     ph = 660
-#     pdf.drawString(mX1  ,-ph , l_prixht)
-#     pdf.drawString(mX1 + 95  ,-ph, l_tva)
-#     pdf.setFont('ErasITC-Demi', 13)
-#     pdf.drawString(mX1 + 190 ,-ph , l_prixttc)
-#     pdf.setFont('ErasITC-Light', 13)
-#     pdf.drawString(mX1 + 290 ,-ph , l_acompte)
-#     pdf.setFont('ErasITC-Demi', 13)
-#     pdf.drawString(mX1 + 410 ,-ph , l_netapayer)
-#     pdf.setFont('ErasITC-Light', 13)
-#     ph = 690
-#     pdf.drawString(mX1  ,-ph , '%.2f' % prices[0])
-#     pdf.drawString(mX1 + 95  ,-ph, '%.2f' % prices[1])
-#     pdf.setFont('ErasITC-Demi', 13)
-#     pdf.drawString(mX1 + 190 ,-ph , '%.2f' % prices[2])
-#     pdf.setFont('ErasITC-Light', 13)
-#     pdf.drawString(mX1 + 290 ,-ph , '%.2f' % prices[3])
-#     pdf.setFont('ErasITC-Demi', 13)
-#     pdf.drawString(mX1 + 410 ,-ph , '%.2f' % prices[4])
-#     pdf.setFont('Helvetica', 14)
-#     pdf.drawString(mX1 + 480 ,-ph ,'€')
-#
-#     # Footer
-#     w = 210/1.2*mm
-#     h = w * get_image(img_footer)
-#     pdf.drawImage(img_footer, W/2-w/2, -H+20, width=w, height=h,  mask='auto')
-#
-#     return pdf

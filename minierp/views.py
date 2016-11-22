@@ -11,7 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView, View
-
+from django.db.models import Q
 from minierp.models import Client, Tva, Facture, FactureStep
 from minierp.forms import ClientForm, TvaForm, FactureForm, DescriptionFormSet, FactureStepForm
 from minierp.pdf import generate_invoice
@@ -115,7 +115,9 @@ class ClientAutocomplete(autocomplete.Select2QuerySetView):
 
         qs = Client.objects.all()
         if self.q:
-            qs = qs.filter(nom__istartswith=self.q)
+            qs = qs.filter(Q(nom__istartswith=self.q) |
+                           Q(civilite__istartswith=self.q) |
+                           Q(prenom__istartswith=self.q))
 
         return qs
 
@@ -123,7 +125,6 @@ class ClientAutocomplete(autocomplete.Select2QuerySetView):
 @csrf_exempt
 def get_client_data(request):
     id_client = int(request.POST.get('id', ''))
-
     if id_client:
         client = Client.objects.get(pk=id_client)
         data = {'address': client.adresse, 'cp': client.cp, 'city': client.ville}
@@ -246,8 +247,7 @@ def facture_edit(request, pk):
     # get existing in case of edition (nothing here in creation)
     facture = get_object_or_404(Facture, pk=pk)
     facture_steps = FactureStep.objects.filter(facture=facture)
-    fs_data = [{'step_title': fs.step_title, 'step_description': fs.step_description}
-                 for fs in facture_steps]
+    fs_data = [{'step_title': fs.step_title, 'step_description': fs.step_description} for fs in facture_steps]
 
     if request.method == 'POST':
         facture_form = FactureForm(request.POST, instance=facture)
@@ -287,25 +287,14 @@ def facture_edit(request, pk):
     return render(request, 'minierp/facture_form.html', context)
 
 
-
-# class FactureEdit(SuccessMessageMixin, UpdateView):
-#     model = Facture
-#     form_class = FactureForm
-#     success_url = reverse_lazy('facture-list')
-#     success_message = u'La facture a bien été modifiée.'
-
-
-class formset_debug(object):
-    step_title = 'Restauration d\'une commode'
-    step_description = 'test'*60
-
-
 def FactureDetail(request, pk):
 
     # get facture
     facture = Facture.objects.get(pk=pk)
+
     # get related description steps
-    formset = DescriptionFormSet(instance=facture)
+    # Car.objects.filter(id__in=(1, 2))
+    formset = FactureStep.objects.filter(facture=facture)
 
     # get facture number to create facture filename
     filename = 'F_' + str(pk)
@@ -315,7 +304,6 @@ def FactureDetail(request, pk):
     response['Content-Disposition'] = 'inline; filename=' + filename + '.pdf'
 
     # generate pdf with report lab library
-    formset = formset_debug()
     pdf = generate_invoice(response, facture, formset)
 
     # show page

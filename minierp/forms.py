@@ -62,13 +62,21 @@ class FactureForm(ModelForm):
             field.widget.attrs['class'] = 'form-control'
         # self.fields['acompteht'].widget.attrs['class'] = 'form-control'
         self.fields['acompteht'].widget.attrs['placeholder'] = 'Acompte HT'
+        # self.initial['acompteht'] = 0.00
         self.fields['acomptettc'].widget.attrs['placeholder'] = 'Acompte TTC'
+        # self.initial['acomptettc'] = 0.00
         self.fields['tva'].widget.attrs['placeholder'] = 'TVA'
+        self.initial['tva'] = 1
         self.fields['prixht'].widget.attrs['placeholder'] = 'Prix HT'
+        # self.initial['prixht'] = 0.00
         self.fields['prixttc'].widget.attrs['placeholder'] = 'Prix TTC'
+        # self.initial['prixttc'] = 0.00
         self.fields['dejaregle'].widget.attrs['placeholder'] = 'Déjà Réglé'
+        # self.initial['dejaregle'] = 0.00
         self.fields['parttva'].widget.attrs['placeholder'] = 'Part TVA'
+        # self.initial['parttva'] = 0.00
         self.fields['netapayer'].widget.attrs['placeholder'] = 'Net à payer'
+        # self.initial['netapayer'] = 0.00
         self.fields['netapayer'].widget.attrs['class'] = 'form-control has-success'
         # self.fields['acompteht'].widget.attrs['placeholder'] = 'Acompte HT'
 
@@ -80,7 +88,7 @@ class FactureForm(ModelForm):
         }
         labels = {
             'id_client': 'Client',
-            'add_description': 'Texte additionel (facultatif)'
+            'add_description': 'Choisissez un client'
         }
 #
 # class FactureForm(ModelForm):

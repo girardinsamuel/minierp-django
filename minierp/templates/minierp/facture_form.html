@@ -28,18 +28,18 @@
 
                     <div class="form-group row">
                         <div class="col-xs-8">
-                            <input type="text" class="form-control" id="id_client_address" placeholder="Adresse">
+                            <input type="text" class="form-control" id="id_client_address" placeholder="Adresse" readonly>
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-xs-3">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="id_client_cp" placeholder="Code Postal">
+                                <input type="text" class="form-control" id="id_client_cp" placeholder="Code Postal" readonly>
                             </div>
                         </div>
                         <div class="col-xs-6">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="id_client_city" placeholder="Ville">
+                                <input type="text" class="form-control" id="id_client_city" placeholder="Ville" readonly>
                             </div>
                         </div>
                     </div>
@@ -89,6 +89,7 @@
                     {% endif %}
 
                     <legend class="col-form-legend">Tarification</legend>
+                    <a class="btn btn-primary" onclick="init_prices()">RAZ</a>
                     <div class="form-group row">
                         <div class="col-xs-4">
                             <div class="input-group">
@@ -169,6 +170,7 @@
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
 <script src="{% static 'js/locales/bootstrap-datepicker.fr.js' %}"></script>
+<script src="{% static 'js/prices_update.js' %}"></script>
 
 <script>
     $('.link-formset').formset({
