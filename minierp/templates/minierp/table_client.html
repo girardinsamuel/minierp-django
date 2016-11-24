@@ -24,7 +24,7 @@
       <td>{{ c.ville }}</td>
       <td><a href="{% url 'client-edit' c.pk  %}" class="btn btn-sm btn-primary" role="button">Modifier</a></td>
       <td><a href="{% url 'client-detail' c.pk  %}" class="btn btn-sm btn-primary" role="button">Fiche</a></td>
-      <td><a href="#" class="btn btn-sm btn-primary" role="button">Facturer</a></td>
+      <td><a href="#" class="btn btn-sm btn-default" role="button">Facturer</a></td>
     </tr>
   {% endfor %}
   </tbody>

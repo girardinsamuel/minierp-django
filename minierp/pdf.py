@@ -18,7 +18,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
 
 # TODO check how to use real STATIC variable
-# from gestion.settings import STATIC_ROOT
+# from gestion.settings import BASE_DIR
 static = '/home/samuel/Projets/Archives/Old/GestionPME/gestionpme/djpgirardin/static'
 IMG_HEADER = static + '/images/entete.png'
 IMG_FOOTER = static + '/images/pied.png'

@@ -5,7 +5,6 @@ from minierp.views import *
 
 urlpatterns = [
     url(r'^$', home, name='home'),
-    url(r'^test/$', test, name='test'),
     url(r'^tva/$', AddTva.as_view(), name='add-tva'),
     url(r'^tva/delete/(?P<pk>\d+)$', DeleteTva.as_view(), name='delete-tva'),
     url(r'^clients/$', ClientList.as_view(), name='client-list'),

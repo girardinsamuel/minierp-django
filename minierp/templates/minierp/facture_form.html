@@ -92,12 +92,14 @@
                     <a class="btn btn-primary" onclick="init_prices()">RAZ</a>
                     <div class="form-group row">
                         <div class="col-xs-4">
+                            {{ form.acompteht.label_tag }}
                             <div class="input-group">
                                 {{ form.acompteht }}
                                 <div class="input-group-addon">€</div>
                             </div>
                         </div>
                         <div class="col-xs-4">
+                            {{ form.prixht.label_tag }}
                             <div class="input-group">
                                 {{ form.prixht }}
                                 <div class="input-group-addon">€</div>
@@ -106,12 +108,14 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-xs-4">
+                            {{ form.acomptettc.label_tag }}
                             <div class="input-group">
                                 {{ form.acomptettc }}
                                 <div class="input-group-addon">€</div>
                             </div>
                         </div>
                         <div class="col-xs-4">
+                            {{ form.prixttc.label_tag }}
                             <div class="input-group">
                                 {{ form.prixttc }}
                                 <div class="input-group-addon">€</div>
@@ -120,12 +124,14 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-xs-4">
+                            {{ form.dejaregle.label_tag }}
                             <div class="input-group">
                                 {{ form.dejaregle }}
                                 <div class="input-group-addon">€</div>
                             </div>
                         </div>
                         <div class="col-xs-4">
+                             {{ form.parttva.label_tag }}
                             <div class="input-group">
                                 {{ form.parttva }}
                                 <div class="input-group-addon">€</div>
@@ -134,12 +140,14 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-xs-4">
+                            {{ form.tva.label_tag }}
                             <div class="input-group">
                                 {{ form.tva }}
                                 <div class="input-group-addon">%</div>
                             </div>
                         </div>
                         <div class="col-xs-4">
+                            {{ form.netapayer.label_tag }}
                             <div class="input-group">
                                 {{ form.netapayer }}
                                 <div class="input-group-addon">€</div>
@@ -199,7 +207,7 @@ $(document).ready(function() {
   $("#id_id_client").change(function(){
     $.ajax({
       // The URL for the request
-      url: "/minierp/client-data/",
+      url: "/djpgirardin/client-data/",
       // The data to send (will be converted to a query string)
       data: {
           id: $(this).val()

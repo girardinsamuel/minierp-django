@@ -43,7 +43,6 @@
           </div>
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#">Accueil</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Factures<span class="caret"></span></a>
                 <ul class="dropdown-menu">
@@ -67,6 +66,7 @@
               </li>
               <li><a href="#enveloppes"><span class="text-muted">Enveloppes</span></a></li>
               <li><a href="{% url 'add-tva' %}">TVA</a></li>
+              <li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-logout" style="color:white"></span></a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>

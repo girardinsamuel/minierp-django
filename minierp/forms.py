@@ -88,7 +88,7 @@ class FactureForm(ModelForm):
         }
         labels = {
             'id_client': 'Client',
-            'add_description': 'Choisissez un client'
+            'add_description': 'Description additionelle (facultative)'
         }
 #
 # class FactureForm(ModelForm):
