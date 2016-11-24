@@ -31,7 +31,7 @@ def home(request):
     # context_dict['devis_list'] = Devis.objects.order_by('-pk')[:3]
     context_dict['facture_list'] = Facture.objects.order_by('-pk')[:3]
 
-    return render(request, 'base.html', context_dict)
+    return render(request, 'base-minierp.html', context_dict)
 
 
 class ClientList(ListView):

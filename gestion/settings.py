@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'bootstrapform',
     'dal',
     'dal_select2',
-    # debug only
-    'debug_toolbar',
 ]
 
 MIDDLEWARE_CLASSES = [
