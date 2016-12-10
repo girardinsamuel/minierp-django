@@ -7,6 +7,7 @@ class Client(models.Model):
     CIVILITES = (
         ('M.', 'M.'),
         ('Mme', 'Mme'),
+        ('M. et Mme', 'M. et Mme'),
         ('SARL', 'SARL')
     )
     civilite  = models.CharField(max_length=10,choices=CIVILITES, default='M.')

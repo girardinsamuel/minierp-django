@@ -66,7 +66,7 @@ class FactureForm(ModelForm):
         self.fields['acomptettc'].widget.attrs['placeholder'] = 'Acompte TTC'
         # self.initial['acomptettc'] = 0.00
         self.fields['tva'].widget.attrs['placeholder'] = 'TVA'
-        self.initial['tva'] = 1
+        self.initial['tva'] = 2
         self.fields['prixht'].widget.attrs['placeholder'] = 'Prix HT'
         # self.initial['prixht'] = 0.00
         self.fields['prixttc'].widget.attrs['placeholder'] = 'Prix TTC'
