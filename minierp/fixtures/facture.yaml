@@ -1,0 +1,15 @@
+- model: minierp.facture
+  pk: 1
+  fields:
+    date: "2016-10-23"
+    id_client: 1
+    titre: "Restauration d'une commode"
+    description: "Décapage."
+    acompteht: 0.0
+    acomptettc: 0.0
+    tva: 1
+    prixht: 804.0
+    prixttc: 1000.0
+    dejaregle: 0.0
+    parttva: 196.0
+    netapayer: 1000.0

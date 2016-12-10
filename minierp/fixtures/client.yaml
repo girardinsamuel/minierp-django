@@ -1,0 +1,9 @@
+- model: minierp.client
+  pk: 1
+  fields:
+    civilite: M.
+    nom: Girardin
+    prenom: Samuel
+    adresse: 35 rue Léon Jamin
+    ville: Nantes
+    cp: 44000
