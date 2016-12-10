@@ -86,6 +86,8 @@
                     {% endfor %}
                     {% endif %}
 
+                    {{ form.add_description|bootstrap_horizontal }}
+
                     <legend class="col-form-legend">Tarification</legend>
                     <a class="btn btn-primary" onclick="init_prices()">RAZ</a>
                     <div class="form-group row">
@@ -152,8 +154,6 @@
                             </div>
                         </div>
                     </div>
-
-                     {{ form.add_description|bootstrap_horizontal }}
 
                     <div class="form-group">
                         <div class="controls ">
