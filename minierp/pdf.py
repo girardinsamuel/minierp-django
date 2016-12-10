@@ -19,7 +19,8 @@ from reportlab.lib.enums import TA_CENTER
 
 # TODO check how to use real STATIC variable
 # from gestion.settings import BASE_DIR
-static = 'static'
+static = 'minierp/static'
+# static = '/home/samuel/Projects/In Progress/minierp-django/minierp/static'
 IMG_HEADER = static + '/img/entete.png'
 IMG_FOOTER = static + '/img/pied.png'
 
