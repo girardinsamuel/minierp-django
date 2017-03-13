@@ -10,7 +10,7 @@ class Client(models.Model):
         ('M. et Mme', 'M. et Mme'),
         ('SARL', 'SARL')
     )
-    civilite  = models.CharField(max_length=10,choices=CIVILITES, default='M.')
+    civilite = models.CharField(max_length=10,choices=CIVILITES, default='M.')
     nom = models.CharField(max_length=255)
     prenom = models.CharField(max_length=255, blank=True)
     adresse = models.CharField(max_length=255, blank=True)
@@ -48,10 +48,31 @@ class Facture(models.Model):
         return unicode(self.id_client)
 
 
+class Devis(models.Model):
+    date = models.DateField(default=timezone.now)
+    id_client = models.ForeignKey('Client')
+    add_description = models.TextField(max_length=400, null=True, blank=True)
+
+    def __unicode__(self):
+        return unicode(self.id_client)
+
+    def get_client(self):
+        return unicode(self.id_client)
+
+
+class DevisStep(models.Model):
+    devis = models.ForeignKey(Devis)
+    step_title = models.CharField(max_length=255)
+    step_description = models.TextField(max_length=500)
+
+    def __unicode__(self):
+        return unicode(self.step_title)
+
+
 class FactureStep(models.Model):
     facture = models.ForeignKey(Facture)
     step_title = models.CharField(max_length=255)
     step_description = models.TextField(max_length=500)
 
     def __unicode__(self):
-        return str(self.step_title)
+        return unicode(self.step_title)

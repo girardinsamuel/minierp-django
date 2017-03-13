@@ -1,0 +1,232 @@
+{% extends "base-minierp.html" %}
+{% load bootstrap %}
+{% load staticfiles %}
+
+{% block title %}{% if is_edition %}Modifier{% else %}Crééer{% endif %} un devis{% endblock title %}
+
+{% block extra_head_content %}
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+{% endblock extra_head_content %}
+
+{% block content %}
+<!-- Page Content -->
+<div class="container">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-lg-10">
+                <h3>{% if is_edition %}Modifier{% else %}Crééer{% endif %} un devis</h3>
+
+                <form class="form-horizontal" method="post">
+                    {% csrf_token %}
+
+                    <legend class="col-form-legend">Client</legend>
+                    <div class="form-group row">
+                        <div class="col-xs-8">
+                            {{ form.id_client }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-xs-8">
+                            <input type="text" class="form-control" id="id_client_address" placeholder="Adresse" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="id_client_cp" placeholder="Code Postal" readonly>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="id_client_city" placeholder="Ville" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <legend class="col-form-legend">Détails</legend>
+
+                     <!--<input type="text" class="form-control" id="id_date" placeholder="DAte 2">-->
+
+                     <div class="form-group row">
+                        <div class="col-xs-4">
+                            <div class="input-group">
+                                 {{ form.date|bootstrap_horizontal }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% for devisstep in devisstep_formset %}
+                    <div class="link-formset">
+                        {% if devisstep.instance.pk %}{{ devisstep.DELETE }}{% endif %}
+
+                        {{ devisstep|bootstrap_horizontal}}
+                        {% comment %}
+                        {% if devisstep.step_title.errors %}
+                        {% for error in devisstep.step_title.errors %}
+                        {{ error|escape }}
+                        {% endfor %}
+                        {% endif %}
+
+                        {{ devisstep.step_description }}
+                        {% if devisstep.step_description.errors %}
+                        {% for error in devisstep.step_description.errors %}
+                        {{ error|escape }}
+                        {% endfor %}
+                        {% endif %}
+                        {% endcomment %}
+                    </div>
+
+                    {% endfor %}
+                    {{ devisstep_formset.management_form }}
+
+                    {% if devisstep.non_form_errors %}
+                    {% for error in devisstep.non_form_errors %}
+                    {{ error|escape }}
+                    {% endfor %}
+                    {% endif %}
+
+                    {{ form.add_description|bootstrap_horizontal }}
+
+                    <!--<legend class="col-form-legend">Tarification</legend>-->
+                    <!--<a class="btn btn-primary" onclick="init_prices()">RAZ</a>-->
+                    <!--<div class="form-group row">-->
+                        <!--<div class="col-xs-4">-->
+                            <!--{{ form.acompteht.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.acompteht }}-->
+                                <!--<div class="input-group-addon">€</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-4">-->
+                            <!--{{ form.prixht.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.prixht }}-->
+                                <!--<div class="input-group-addon">€</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="form-group row">-->
+                        <!--<div class="col-xs-4">-->
+                            <!--{{ form.acomptettc.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.acomptettc }}-->
+                                <!--<div class="input-group-addon">€</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-4">-->
+                            <!--{{ form.prixttc.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.prixttc }}-->
+                                <!--<div class="input-group-addon">€</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="form-group row">-->
+                        <!--<div class="col-xs-4">-->
+                            <!--{{ form.dejaregle.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.dejaregle }}-->
+                                <!--<div class="input-group-addon">€</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-4">-->
+                             <!--{{ form.parttva.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.parttva }}-->
+                                <!--<div class="input-group-addon">€</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="form-group row">-->
+                        <!--<div class="col-xs-4">-->
+                            <!--{{ form.tva.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.tva }}-->
+                                <!--<div class="input-group-addon">%</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="col-xs-4">-->
+                            <!--{{ form.netapayer.label_tag }}-->
+                            <!--<div class="input-group">-->
+                                <!--{{ form.netapayer }}-->
+                                <!--<div class="input-group-addon">€</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <div class="form-group">
+                        <div class="controls ">
+                        <!--<div class="col-sm-10 col-sm-offset-2">-->
+                            <a class="btn btn-default" href="{% url 'facture-list' %}">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Crééer</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block extra_script_content  %}
+{{ form.media }}
+
+
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'js/locales/bootstrap-datepicker.fr.js' %}"></script>
+<script src="{% static 'js/prices_update.js' %}"></script>
+
+<script>
+    $('.link-formset').formset({
+        prefix:  '{{ devisstep_formset.prefix }}',
+        addText: 'Ajouter une étape',
+        deleteText: 'Enlever',
+        addCssClass: 'btn btn-primary',
+        deleteCssClass: 'btn btn-danger',
+    });
+</script>
+
+<script>
+
+$(document).ready(function(){
+  $(function() {
+   $('#id_date').datepicker({
+        format: "dd/mm/yyyy",
+        language: "fr",
+        autoclose: true,
+        todayHighlight: true
+        });
+  });
+});
+
+$(document).ready(function() {
+  $("#id_id_client").change(function(){
+    $.ajax({
+      // The URL for the request
+      url: "/djpgirardin/client-data/",
+      // The data to send (will be converted to a query string)
+      data: {
+          id: $(this).val()
+      },
+      // Whether this is a POST or GET request
+      type: "POST",
+      // The type of data we expect back
+      dataType : "json",
+      // Code to run if the request succeeds;
+      // the response is passed to the function
+      success: function( json ) {
+          $("#id_client_address").val(json.address);
+          $("#id_client_cp").val(json.cp);
+          $("#id_client_city").val(json.city);
+      }
+    });
+  });
+});
+
+</script>
+
+{% endblock %}

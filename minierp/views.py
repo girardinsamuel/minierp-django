@@ -13,8 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView, View
 from django.db.models import Q
 from minierp.models import Client, Tva, Facture, FactureStep
-from minierp.forms import ClientForm, TvaForm, FactureForm, DescriptionFormSet, FactureStepForm
-from minierp.pdf import generate_invoice
+from minierp.forms import *
+from minierp.pdf import generate_invoice, generate_quote
 
 from dal import autocomplete
 
@@ -106,6 +106,11 @@ class DeleteTva(SuccessMessageMixin, DeleteView):
 
 class FactureList(ListView):
     model = Facture
+    # paginate_by = 10
+
+
+class DevisList(ListView):
+    model = Devis
     # paginate_by = 10
 
 
@@ -239,6 +244,49 @@ def facture_create(request):
     return render(request, 'minierp/facture_form.html', context)
 
 
+def devis_create(request):
+
+    DevisStepFormSet = formset_factory(DevisStepForm, formset=DescriptionDevisFormSet)
+
+    # get existing in case of edition (nothing here in creation)
+
+    if request.method == 'POST':
+        devis_form = DevisForm(request.POST)
+        devisstep_formset = DevisStepFormSet(request.POST)
+
+        if devis_form.is_valid() and devisstep_formset.is_valid():
+
+            # Save facture info
+            devis = devis_form.save()
+            # description_form.instance = self.object
+
+            new_steps = []
+            for devisstep in devisstep_formset:
+                d = devisstep.cleaned_data.get('step_description')
+                t = devisstep.cleaned_data.get('step_title')
+
+                if d and t:
+                    new_steps.append(DevisStep(facture=devis, step_description=d, step_title=t))
+
+            with transaction.atomic():
+                # Replace the old with the new
+                DevisStep.objects.filter(facture=devis).delete()
+                DevisStep.objects.bulk_create(new_steps)
+
+            messages.success(request, 'Le devis n° %d a bien été créé.' % devis.pk)
+            return HttpResponseRedirect(reverse_lazy('devis-list'))
+    else:
+        devis_form = DevisForm()
+        devisstep_formset = DescriptionFormSet()  # put initial data in edition
+
+    context = {
+        'form': devis_form,
+        'devisstep_formset': devisstep_formset,
+        'is_edition': False
+    }
+
+    return render(request, 'minierp/devis_form.html', context)
+
 
 def facture_edit(request, pk):
 
@@ -288,7 +336,6 @@ def facture_edit(request, pk):
 
 
 def FactureDetail(request, pk):
-
     # get facture
     facture = Facture.objects.get(pk=pk)
 
@@ -305,6 +352,31 @@ def FactureDetail(request, pk):
 
     # generate pdf with report lab library
     pdf = generate_invoice(response, facture, formset)
+
+    # show page
+    pdf.showPage()
+    pdf.save()
+
+    return response
+
+
+def DevisDetail(request, pk):
+    # get facture
+    devis = Devis.objects.get(pk=pk)
+
+    # get related description steps
+    # Car.objects.filter(id__in=(1, 2))
+    formset = DevisStep.objects.filter(devis=devis)
+
+    # get devis number to create devis filename
+    filename = 'D_' + str(pk)
+
+    # create the HttpResponse object with the appropriate PDF headers.
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=' + filename + '.pdf'
+
+    # generate pdf with report lab library
+    pdf = generate_quote(response, devis, formset)
 
     # show page
     pdf.showPage()

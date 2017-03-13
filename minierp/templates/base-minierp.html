@@ -51,11 +51,11 @@
                 </ul>
               </li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="text-muted">Devis</span><span class="caret"></span></a>
-                <!--<ul class="dropdown-menu">-->
-                  <!--<li><a href="#">Créer</a></li>-->
-                  <!--<li><a href="#">Listes</a></li>-->
-                <!--</ul>-->
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Devis<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{% url 'devis-create' %}">Créer</a></li>
+                  <li><a href="{% url 'devis-list' %}">Listes</a></li>
+                </ul>
               </li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Clients<span class="caret"></span></a>
@@ -76,7 +76,7 @@
     {% block messages %}{% endblock %}
 
     <!-- Content -->
-    {% block content %}        
+    {% block content %}
     <!-- Page Content -->
     <div class="container">
         <div class="page-header">

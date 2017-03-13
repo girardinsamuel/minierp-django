@@ -5,7 +5,7 @@ from crispy_forms.layout import Submit, Button, HTML, Layout, Field, Fieldset, D
 from dal import autocomplete
 from django.forms import ModelForm, inlineformset_factory
 from django import forms
-from minierp.models import Client, Tva, Facture, FactureStep
+from minierp.models import Client, Tva, Facture, FactureStep, Devis, DevisStep
 
 
 class TvaForm(ModelForm):
@@ -50,7 +50,22 @@ class FactureStepForm(ModelForm):
             'step_description': 'Description étape'
         }
 
-DescriptionFormSet = inlineformset_factory(Facture, FactureStep, form=FactureStepForm, extra=1, max_num=6, can_delete=False, fields='__all__')
+
+class DevisStepForm(ModelForm):
+    class Meta:
+        model = DevisStep
+        fields = ('step_title', 'step_description')
+        labels = {
+            'step_title': 'Titre étape',
+            'step_description': 'Description étape'
+        }
+
+
+DescriptionFormSet = inlineformset_factory(Facture, FactureStep, form=FactureStepForm, extra=1, max_num=6,
+                                           can_delete=False, fields='__all__')
+
+DescriptionDevisFormSet = inlineformset_factory(Devis, DevisStep, form=DevisStepForm, extra=1, max_num=6,
+                                                can_delete=False, fields='__all__')
 
 
 class FactureForm(ModelForm):
@@ -90,7 +105,45 @@ class FactureForm(ModelForm):
             'id_client': 'Client',
             'add_description': 'Description additionelle (facultative)'
         }
-#
+
+
+class DevisForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(DevisForm, self).__init__(*args, **kwargs)
+        # TODO: some fields already have form-control classes
+        for field in self.fields.itervalues():
+            field.widget.attrs['class'] = 'form-control'
+        # self.fields['acompteht'].widget.attrs['class'] = 'form-control'
+        # self.fields['acompteht'].widget.attrs['placeholder'] = 'Acompte HT'
+        # self.initial['acompteht'] = 0.00
+        # self.fields['acomptettc'].widget.attrs['placeholder'] = 'Acompte TTC'
+        # self.initial['acomptettc'] = 0.00
+        # self.fields['tva'].widget.attrs['placeholder'] = 'TVA'
+        # self.initial['tva'] = 2
+        # self.fields['prixht'].widget.attrs['placeholder'] = 'Prix HT'
+        # self.initial['prixht'] = 0.00
+        # self.fields['prixttc'].widget.attrs['placeholder'] = 'Prix TTC'
+        # self.initial['prixttc'] = 0.00
+        # self.fields['dejaregle'].widget.attrs['placeholder'] = 'Déjà Réglé'
+        # self.initial['dejaregle'] = 0.00
+        # self.fields['parttva'].widget.attrs['placeholder'] = 'Part TVA'
+        # self.initial['parttva'] = 0.00
+        # self.fields['netapayer'].widget.attrs['placeholder'] = 'Net à payer'
+        # self.initial['netapayer'] = 0.00
+        # self.fields['netapayer'].widget.attrs['class'] = 'form-control has-success'
+        # self.fields['acompteht'].widget.attrs['placeholder'] = 'Acompte HT'
+
+    class Meta:
+        model = Devis
+        fields = '__all__'
+        widgets = {
+            'id_client': autocomplete.ModelSelect2(url='client-autocomplete')
+        }
+        labels = {
+            'id_client': 'Client',
+            'add_description': 'Description additionelle (facultative)'
+        }
+
 # class FactureForm(ModelForm):
 #     client_address = forms.CharField(required=False, label='Adresse')
 #     client_cp = forms.CharField(required=False, label='Code Postal')
