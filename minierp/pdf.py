@@ -156,16 +156,82 @@ def get_height_step(formset):
     return h
 
 
+def get_height(p):
+    # number of lines of description + 1 one for title
+    nb = p.count('\n') + 2
+    h = nb * d + 30  # interligne
+    # TODO change with wrap paragraph to get height ?
+    return h
+
+
 def change_page(pdf):
-    pass
+    pdf.showPage()
+    pdf.setLineWidth(.3)
+    pdf.setFont('ErasITC-Light', 13)
+    pdf.translate(0, 297 * mm)
+    add_header(pdf)
+    add_footer(pdf)
 
 
-def generate_quote(response, q):
+def generate_quote(response, q, formset):
 
-    nq_line = 'Devis'
+    # parse data
+    date = DateFormat(q.date).format(get_format('DATE_FORMAT'))
+    c = q.id_client
+    # prices = [f.prixht, f.parttva, f.prixttc, f.dejaregle, f.netapayer]
+    nf = int(q.pk)
+    nf_line = 'Devis'
 
-    pass
+    # init pdf canvas
+    pdf = init_pdf(response)
+    add_header(pdf)
+    add_footer(pdf)
 
+    # add client block
+    add_client_and_title(pdf, nf_line, c, date)
+
+    hmax = MAX_ONE_PAGE
+    first = True
+    add_txt = unicode(q.add_description).replace(r'\r', '</br>\n')
+
+    htot = 0
+
+    step = formset[0]
+    step.step_description = unicode(step.step_description).replace('\n', '<br />\n')
+    h = get_height_step(step)
+    add_description_step(pdf, step, h=10)
+
+    step = formset[1]
+    step.step_description = unicode(step.step_description).replace('\n', '<br />\n')
+    h1 = get_height_step(step)
+    add_description_step(pdf, step, h=h-10)
+
+    step = formset[2]
+    step.step_description = unicode(step.step_description).replace('\n', '<br />\n')
+    h = get_height_step(step)
+    add_description_step(pdf, step, h=h+h1+30)
+
+    change_page(pdf)
+
+    step = formset[3]
+    step.step_description = unicode(step.step_description).replace('\n', '<br />\n')
+    h1 = -120
+    add_description_step(pdf, step, h=h1)
+
+    step = formset[4]
+    step.step_description = unicode(step.step_description).replace('\n', '<br />\n')
+    h = get_height_step(step)
+    add_description_step(pdf, step, h=h + h1-10)
+
+    if add_txt:
+        h = get_height(add_txt)
+        if not h < hmax:
+            change_page(pdf)
+        add_additional_text(pdf, add_txt)
+
+    # add_prices(pdf, prices)
+
+    return pdf
 
 def generate_invoice(response, f, formset):
 
