@@ -8,7 +8,8 @@ class Client(models.Model):
         ('M.', 'M.'),
         ('Mme', 'Mme'),
         ('M. et Mme', 'M. et Mme'),
-        ('SARL', 'SARL')
+        ('SARL', 'SARL'),
+        ('Domaine', 'Domaine')
     )
     civilite  = models.CharField(max_length=10,choices=CIVILITES, default='M.')
     nom = models.CharField(max_length=255)
