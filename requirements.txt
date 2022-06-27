@@ -1,5 +1,5 @@
 django==1.10.2
 django-autocomplete-light
 django-crispy-forms==1.6.1
-reportlab==3.2.0
+reportlab==3.5.55
 django-bootstrap-form
